@@ -16,7 +16,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use typeof to check that your conversion succeeded
 
 #ANSWER
-
+year_check <-  glimpse(select(ds,c("Year"))) # Year is a char data type
+ds$Year <-  as.numeric(ds$Year)
+typeof(ds$Year)
 
 ### Question 2 ---------- 
 
@@ -24,6 +26,10 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # change ds so that all of the variables are lowercase
 
 #ANSWER
+
+song_lower <-  tolower(ds$Song)
+artist_lower <-  tolower(ds$Artist)
+ds <- mutate(ds, Song = song_lower, Artist = artist_lower)
 
 ### Question 3 ----------
 
@@ -33,11 +39,18 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds$DOY <- ds$Year
+ds <- ds %>% 
+  mutate(DOY = floor(DOY/10) * 10)
+
 ### Question 4 ----------
 
 # Sort the dataset by rank so that 1 is at the top
 
 #ANSWER
+
+ds <- ds %>%
+  arrange(Rank)
 
 ### Question 5 ----------
 
@@ -46,6 +59,8 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+top10 <- ds %>%
+  filter(Rank < 11)
 
 ### Question 6 ----------
 
@@ -53,7 +68,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # of all songs on the full list. Save it to a new tibble called "ds_sum"
 
 #ANSWER
-
+ds_sum <- ds %>% summarize(earliest = min(Year, na.rm = T),
+                           most_recent = max(Year, na.rm = T),
+                            average_release_year = mean(Year, na.rm = T))
 
 ### Question 7 ----------
 
@@ -63,6 +80,8 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds_filtered <- filter(ds, Year == ds_sum$earliest | Year == ds_sum$most_recent | Year == round(ds_sum$average_release_year))
+ds_filtered <- ds_filtered %>% arrange(Year)
 
 ### Question 8 ---------- 
 
@@ -74,6 +93,16 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds <- ds %>%
+  mutate(Year = ifelse(Song == "brass in pocket", 1979, Year))
+ds$DOY <- ds$Year
+ds <- ds %>% 
+  mutate(DOY = floor(DOY/10) * 10)
+ds_sum <- ds %>% summarize(earliest = min(Year, na.rm = T),
+                           most_recent = max(Year, na.rm = T),
+                           average_release_year = mean(Year, na.rm = T))
+ds_filtered <- filter(ds, Year == ds_sum$earliest | Year == ds_sum$most_recent | Year == round(ds_sum$average_release_year))
+ds_filtered <- ds_filtered %>% arrange(Year)
 
 ### Question 9 ---------
 
@@ -84,6 +113,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use the pipe %>% to string the commands together
 
 #ANSWER
+
 
 
 ### Question 10 --------
